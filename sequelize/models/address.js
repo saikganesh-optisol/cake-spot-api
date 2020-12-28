@@ -1,6 +1,7 @@
 const {Model, DataTypes} = require('sequelize')
 
 const sequelize = require('../connection')
+const UserDetail = require('./userDetail')
 
 class Address extends Model {}
 
@@ -11,11 +12,11 @@ Address.init({
         primaryKey : true,
     },
 
-    email : {
-        type : DataTypes.STRING(50),
+    userId : {
+        type : DataTypes.INTEGER,
         references : {
-            model : 'UserDetails',
-            key : 'email'
+            model : UserDetail,
+            key : 'id'
         }
     },
 

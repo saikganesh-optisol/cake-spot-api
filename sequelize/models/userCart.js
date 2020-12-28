@@ -12,11 +12,11 @@ UserCart.init({
         primaryKey : true
     },
 
-    email : {
-        type : DataTypes.STRING(50),
+    userId : {
+        type : DataTypes.INTEGER,
         references : {
             model : 'UserDetails',
-            key : 'email'
+            key : 'id'
         }
     },
 

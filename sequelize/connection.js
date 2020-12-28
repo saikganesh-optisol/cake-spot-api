@@ -3,7 +3,7 @@ const {Sequelize} = require('sequelize')
 const sequelize = new Sequelize('sequelizeCommerce','root','root',{
     dialect : 'mysql',
     host : 'localhost',
-    logging : false,
+    logging : console.log,
 })
 
 try 

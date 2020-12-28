@@ -1,4 +1,5 @@
 const {Model, DataTypes} = require('sequelize')
+const bcrypt = require('bcrypt')
 
 const sequelize = require('../connection')
 
@@ -7,13 +8,14 @@ class UserDetail extends Model {}
 UserDetail.init({
 
     email : {
-        type : DataTypes.STRING(50),
+        type : DataTypes.STRING,
         allowNull : false,
-        primaryKey : true,
-        references : {
-            model : 'UserAuthentications',
-            key : 'email'
-        }
+        unique : true
+    },
+
+    password : {
+        type : DataTypes.STRING,
+        allowNull : false
     },
 
     username : {
