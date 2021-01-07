@@ -4,8 +4,13 @@ const express = require('express')
 const cors = require('cors')
 const bcrypt = require('bcrypt')
 
+require('dotenv').config()
+
 // Validators
-const {signInSchema,signUpSchema,addItemSchema,cartSchema,addToCartSchema} = require('./helpers/validationSchema')
+const {signInSchema,signUpSchema,addItemSchema,cartSchema,addToCartSchema} = require('./joi/validationSchema')
+
+//Token generators
+const {generateAuthenticationToken,validateToken} = require('./jwt/jwtUtils')
 
 // Database connection and Table initialization
 const sequelize = require('./sequelize/connection')
@@ -13,7 +18,7 @@ require('./sequelize/bootstrap')()
 const {UserDetail,UserCart,Item,Address} = sequelize.models
 
 
-const PORT = 3000
+const PORT = 3001
 
 
 // Server Definition
@@ -49,7 +54,7 @@ app.post('/signIn',async (req,res)=>{
         //If email exists, checking if password matches with hashed password
         const isEqual = await bcrypt.compare(password,user.password)
 
-        //Reject if password doesnt match
+        //Reject if password does not match
         if(!isEqual)
         {
             return res.status(401).send('Invalid credentials')
@@ -63,13 +68,21 @@ app.post('/signIn',async (req,res)=>{
             attributes : ['address']
         })
 
-        //Sending user data as a response
-        res.status(200).send({
+        const signedInUser = {
             email : user.email,
             username : user.username,
             phone : user.phone,
             addresses : userAddresses
+        }
+
+        const userToken = generateAuthenticationToken({email : user.email})
+        console.log(userToken)
+
+        //Sending user data as a response
+        res.status(200).send({
+            signedInUser,userToken
         })
+
     }
     catch(error)
     {
@@ -79,7 +92,7 @@ app.post('/signIn',async (req,res)=>{
 
 })
 
-app.get('/shop',async (req,res)=>{
+app.get('/shop',validateToken,async (req,res)=>{
     
     try
     {
@@ -97,7 +110,7 @@ app.get('/shop',async (req,res)=>{
 
 })
 
-app.post('/addItem', async (req,res) => {
+app.post('/addItem', validateToken,async (req,res) => {
     
     try
     {
@@ -119,7 +132,7 @@ app.post('/addItem', async (req,res) => {
 
 })
 
-app.get('/cart',async (req,res)=>{
+app.get('/cart',validateToken,async (req,res)=>{
     
     try
     {
@@ -131,7 +144,7 @@ app.get('/cart',async (req,res)=>{
         const cartItemsId = await UserCart.findAll({
             where : {
                 userId
-            }
+            },
         })
 
         // Rejecting if the user doesnt have anything in the cart
@@ -144,7 +157,7 @@ app.get('/cart',async (req,res)=>{
         const cartItems = await Promise.all(cartItemsId.map(async (element) => {
             const item = await Item.findOne({
                 where : {
-                    id : element.id
+                    id : element.itemId
                 }
             })
 
@@ -162,13 +175,13 @@ app.get('/cart',async (req,res)=>{
     }
     catch(error)
     {
-        displayError(error.message)
+        displayError(error)
         return res.status(400).send('failed')
     }
 
 })
 
-app.post('/addToCart',async (req,res)=> {
+app.post('/addToCart',validateToken,async (req,res)=> {
     
     try
     {   
@@ -222,7 +235,12 @@ app.post('/signUp',async (req,res)=>{
             })
         })
 
-        res.status(200).send({username,email,phone,addresses})
+        const signedUpUser = {username,email,phone,addresses}
+        const userToken = generateAuthenticationToken({email})
+
+        res.status(200).send({
+            signedUpUser,userToken
+        })
     }
     catch(error)
     {
