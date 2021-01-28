@@ -1,6 +1,6 @@
 const {Sequelize} = require('sequelize')
 
-const sequelize = new Sequelize('sequelizeCommerce','root','root',{
+const sequelize = new Sequelize('reactecommerce','root','root',{
     dialect : 'mysql',
     host : 'localhost',
     logging : console.log,
@@ -15,4 +15,5 @@ catch(error)
     console.log('Error :',error.message)
 }
 
+global.sequelize = sequelize
 module.exports =  sequelize

@@ -25,6 +25,26 @@ UserDetail.init({
 
     phone : {
         type : DataTypes.INTEGER,
+        allowNull : true,
+    },
+
+    oAuthId : {
+        type : DataTypes.STRING,
+        allowNull : true
+    },
+
+    accessToken : {
+        type : DataTypes.STRING,
+        allowNull : true,
+    },
+
+    domain : {
+        type : DataTypes.STRING,
+        allowNull : false
+    },
+
+    isVerified : {
+        type : DataTypes.BOOLEAN,
         allowNull : false
     }
 

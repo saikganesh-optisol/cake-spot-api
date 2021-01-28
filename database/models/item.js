@@ -17,12 +17,17 @@ Item.init({
     },
 
     description : {
-        type : DataTypes.STRING(50),
+        type : DataTypes.STRING(150),
         allowNull : true
     },
 
     price : {
         type : DataTypes.FLOAT(10,2),
+        allowNull : false
+    },
+
+    picture : {
+        type : DataTypes.BLOB('long'),
         allowNull : false
     }
 },{

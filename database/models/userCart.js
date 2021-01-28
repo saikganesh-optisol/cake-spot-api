@@ -1,6 +1,6 @@
 const {Model, DataTypes} = require('sequelize')
 
-const sequelize = require('../connection')
+const sequelize = global.sequelize
 
 class UserCart extends Model {}
 
@@ -22,11 +22,15 @@ UserCart.init({
 
     itemId : {
         type : DataTypes.INTEGER,
-        references : {
+        references : {           
             model : 'Items',
             key : 'id'
         }
-    }
+    },
+
+    quantity : {
+        type : DataTypes.INTEGER
+    },
 },{
     sequelize,
     modelName : 'UserCart',

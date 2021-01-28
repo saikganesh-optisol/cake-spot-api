@@ -1,10 +1,9 @@
 const jwt = require('jsonwebtoken')
 
 const generateAuthenticationToken = (userDetails) => {
-    console.log(process.env.SECRET_KEY)
     try
     {
-        return jwt.sign(userDetails,process.env.SECRET_KEY,{
+        return jwt.sign(userDetails,process.env.JWT_SECRET_KEY,{
             expiresIn : '24h'
         })
     }
@@ -24,11 +23,14 @@ const validateToken = (req,res,next) => {
         {
             return res.status(401).send('Bad Request')
         }
-        jwt.verify(token,process.env.SECRET_KEY)
+        const data = jwt.verify(token,process.env.JWT_SECRET_KEY)
+        req.userEmail = data.email
+        req.userId = data.id
         next()
     }
     catch(error)
     {
+        console.log(error)
         return res.status(403).send('Error')
     }
 }
